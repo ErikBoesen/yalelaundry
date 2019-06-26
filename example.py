@@ -6,4 +6,4 @@ from pprint import pprint
 api = yalelaundry.YaleLaundry(os.environ['YALE_API_KEY'])
 
 pprint(api.get_rooms())
-#pprint(api.get_availabilities())
+pprint(api.get_availabilities())

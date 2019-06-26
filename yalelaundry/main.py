@@ -5,9 +5,10 @@ class _base(dict):
     def __init__(self, raw):
         self.update(raw)
         self.update(self.__dict__)
+        self.__dict__ = self
 
     def __repr__(self):
-        return self.__name__ + '(' + str(self) + ')'
+        return '%s(%s)' % (self.__class__.__name__, dict.__repr__(self))
 
 
 class Room(_base):
@@ -16,7 +17,7 @@ class Room(_base):
 
         self.campus_name = raw['campus_name']
         self.name = raw['laundry_room_name']
-        self.location = raw['location']
+        self.id = raw['location']
         self.status = raw['status']
         self.online = (self.status == 'online')
         self.offline = not self.online
@@ -49,5 +50,5 @@ class YaleLaundry:
         return [Room(raw) for raw in
                 self.get('school', {'method': 'getRoomData'})['school']['laundry_rooms']['laundryroom']]
 
-    def get_availabilities(self):
+    def get_availabilities(self, location):
         return self.get('room', {'method': 'getNumAvailable'})

@@ -6,6 +6,9 @@ class _base(dict):
         self.update(raw)
         self.update(self.__dict__)
 
+    def __repr__(self):
+        return self.__name__ + '(' + str(self) + ')'
+
 
 class Room(_base):
     def __init__(self, raw):

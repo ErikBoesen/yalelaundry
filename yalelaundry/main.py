@@ -23,13 +23,27 @@ class Room(_base):
         self.offline = not self.online
 
 
+class Availability(_base):
+    def _int(self, raw):
+        if raw == 'undefined':
+            return None
+        else:
+            return int(raw)
+
+    def __init__(self, raw):
+        super().__init__(raw)
+
+        self.dryer = self._int(raw['dryer'])
+        self.washer = self._int(raw['washer'])
+
+
 class YaleLaundry:
     API_ROOT = 'https://gw.its.yale.edu/soa-gateway/laundry/'
 
     def __init__(self, api_key: str):
         self.api_key = api_key
 
-    def get(self, endpoint: str, params: dict = {}):
+    def get(self, endpoint: str, method: str, params: dict = {}):
         """
         Make a GET request to the API.
 
@@ -38,6 +52,7 @@ class YaleLaundry:
         params.update({
             'apikey': self.api_key,
             'type': 'json',
+            'method': method,
         })
         request = requests.get(self.API_ROOT + endpoint, params=params)
         if request.ok:
@@ -48,7 +63,8 @@ class YaleLaundry:
 
     def get_rooms(self):
         return [Room(raw) for raw in
-                self.get('school', {'method': 'getRoomData'})['school']['laundry_rooms']['laundryroom']]
+                self.get('school', 'getRoomData')['school']['laundry_rooms']['laundryroom']]
 
-    def get_availabilities(self, location):
-        return self.get('room', {'method': 'getNumAvailable'})
+    def get_availability(self, location):
+        return Availability(self.get('room', 'getNumAvailable', {'location': location})['laundry_room'])
+

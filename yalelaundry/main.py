@@ -1,8 +1,10 @@
 import requests
+import re
 
 
 class _base(dict):
     def __init__(self, raw):
+        print(raw)
         self.update(raw)
         self.update(self.__dict__)
         self.__dict__ = self
@@ -37,6 +39,31 @@ class Availability(_base):
         self.washer = self._int(raw['washer'])
 
 
+class Total(Availability):
+    pass
+
+
+class Appliance(_base):
+    def _read_time(self, raw: str) -> int:
+        """
+        Given a string describing how much time remains until availability, return how many minutes are actually left.
+        :param raw: string describing time remaining.
+        :return: number of minutes remaining.
+        """
+        if raw == 'available':
+            return 0
+        digits_only = [c for c in raw if c.isdigit()]
+        if digits_only:
+            return int(digits_only)
+
+    def __init__(self, raw):
+        super().__init__(raw)
+
+        self.key = raw['appliance_desc_key']
+        self.time_remaining_raw = raw['time_remaining']
+        self.time_remaining = self._read_time(self.time_remaining_raw)
+
+
 class YaleLaundry:
     API_ROOT = 'https://gw.its.yale.edu/soa-gateway/laundry/'
 
@@ -68,3 +95,10 @@ class YaleLaundry:
     def get_availability(self, location):
         return Availability(self.get('room', 'getNumAvailable', {'location': location})['laundry_room'])
 
+    def get_total(self, location):
+        return Total(self.get('room', 'getTotal', {'location': location})['laundry_room'])
+
+
+    def get_appliances(self, location):
+        return [Appliance(raw) for raw in
+                self.get('room', 'getAppliances', {'location': location})['laundry_room']['appliances']['appliance']]

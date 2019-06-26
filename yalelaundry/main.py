@@ -43,6 +43,11 @@ class Total(Availability):
     pass
 
 
+class Status(_base):
+    def __init__(self, raw):
+        super().__init__(raw)
+
+
 class Appliance(_base):
     def _read_time(self, raw: str) -> int:
         """
@@ -62,6 +67,20 @@ class Appliance(_base):
         self.key = raw['appliance_desc_key']
         self.time_remaining_raw = raw['time_remaining']
         self.time_remaining = self._read_time(self.time_remaining_raw)
+        self.avg_cycle_time = int(raw['avg_cycle_time'])
+        self.out_of_service = bool(int(raw['out_of_service']))
+        self.in_service = not self.out_of_service
+        self.lrm_status = raw['lrm_status']
+        self.online = (self.lrm_status == 'Online')
+        self.offline = not self.online
+        self.label = raw['label']
+        self.type = raw['appliance_type']
+        self.washer = (self.type == 'WASHER')
+        self.dryer = (self.type == 'DRYER')
+        self.status = raw['status']
+        self.available = (self.status == 'Available')
+        self.in_use = (self.status == 'In Use')
+        # TODO: there are probably more statuses
 
 
 class YaleLaundry:
@@ -98,6 +117,9 @@ class YaleLaundry:
     def get_total(self, location):
         return Total(self.get('room', 'getTotal', {'location': location})['laundry_room'])
 
+    def get_status(self, key):
+        return Status(self.get('appliance', 'getStatus', {'appliance_desc_key': key})['laundry_room'])
+        print(self.get('appliance', 'getStatus', {'appliance_desc_key': key})['laundry_room'])
 
     def get_appliances(self, location):
         return [Appliance(raw) for raw in

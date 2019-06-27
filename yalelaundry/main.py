@@ -15,7 +15,7 @@ class _base(dict):
         if digits_only:
             return int(digits_only)
 
-    def __init__(self, raw):
+    def __init__(self, raw, api):
         self.update(raw)
         self.update(self.__dict__)
         self.__dict__ = self
@@ -25,8 +25,8 @@ class _base(dict):
 
 
 class Room(_base):
-    def __init__(self, raw):
-        super().__init__(raw)
+    def __init__(self, raw, api):
+        super().__init__(raw, api)
 
         self.campus_name = raw['campus_name']
         self.name = raw['laundry_room_name']
@@ -43,8 +43,8 @@ class Availability(_base):
         else:
             return int(raw)
 
-    def __init__(self, raw):
-        super().__init__(raw)
+    def __init__(self, raw, api):
+        super().__init__(raw, api)
 
         self.dryer = self._int(raw['dryer'])
         self.washer = self._int(raw['washer'])
@@ -55,8 +55,8 @@ class Total(Availability):
 
 
 class Status(_base):
-    def __init__(self, raw):
-        super().__init__(raw)
+    def __init__(self, raw, api):
+        super().__init__(raw, api)
 
         self.time_remaining_raw = raw['time_remaining']
         self.time_remaining = self._read_time(self.time_remaining_raw)
@@ -68,8 +68,8 @@ class Status(_base):
 
 
 class Appliance(_base):
-    def __init__(self, raw):
-        super().__init__(raw)
+    def __init__(self, raw, api):
+        super().__init__(raw, api)
 
         self.key = raw['appliance_desc_key']
         self.time_remaining_raw = raw['time_remaining']
@@ -115,18 +115,18 @@ class YaleLaundry:
             raise Exception('API request failed. Data returned: ' + request.text)
 
     def get_rooms(self):
-        return [Room(raw) for raw in
+        return [Room(raw, self) for raw in
                 self.get('school', 'getRoomData')['school']['laundry_rooms']['laundryroom']]
 
     def get_availability(self, location):
-        return Availability(self.get('room', 'getNumAvailable', {'location': location})['laundry_room'])
+        return Availability(self.get('room', 'getNumAvailable', {'location': location})['laundry_room'], self)
 
     def get_total(self, location):
-        return Total(self.get('room', 'getTotal', {'location': location})['laundry_room'])
+        return Total(self.get('room', 'getTotal', {'location': location})['laundry_room'], self)
 
     def get_status(self, key):
-        return Status(self.get('appliance', 'getStatus', {'appliance_desc_key': key})['appliance'])
+        return Status(self.get('appliance', 'getStatus', {'appliance_desc_key': key})['appliance'], self)
 
     def get_appliances(self, location):
-        return [Appliance(raw) for raw in
+        return [Appliance(raw, self) for raw in
                 self.get('room', 'getAppliances', {'location': location})['laundry_room']['appliances']['appliance']]

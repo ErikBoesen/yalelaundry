@@ -3,8 +3,19 @@ import re
 
 
 class _base(dict):
+    def _read_time(self, raw: str) -> int:
+        """
+        Given a string describing how much time remains until availability, return how many minutes are actually left.
+        :param raw: string describing time remaining.
+        :return: number of minutes remaining.
+        """
+        if raw == 'available':
+            return 0
+        digits_only = [c for c in raw if c.isdigit()]
+        if digits_only:
+            return int(digits_only)
+
     def __init__(self, raw):
-        print(raw)
         self.update(raw)
         self.update(self.__dict__)
         self.__dict__ = self
@@ -47,20 +58,16 @@ class Status(_base):
     def __init__(self, raw):
         super().__init__(raw)
 
+        self.time_remaining_raw = raw['time_remaining']
+        self.time_remaining = self._read_time(self.time_remaining_raw)
+        self.change_time = int(raw['status_change_time'])
+        self.out_of_service = bool(int(raw['out_of_service']))
+        self.status = raw['status']
+        self.available = (self.status == 'Available')
+        self.in_use = (self.status == 'In Use')
+
 
 class Appliance(_base):
-    def _read_time(self, raw: str) -> int:
-        """
-        Given a string describing how much time remains until availability, return how many minutes are actually left.
-        :param raw: string describing time remaining.
-        :return: number of minutes remaining.
-        """
-        if raw == 'available':
-            return 0
-        digits_only = [c for c in raw if c.isdigit()]
-        if digits_only:
-            return int(digits_only)
-
     def __init__(self, raw):
         super().__init__(raw)
 
@@ -118,8 +125,7 @@ class YaleLaundry:
         return Total(self.get('room', 'getTotal', {'location': location})['laundry_room'])
 
     def get_status(self, key):
-        return Status(self.get('appliance', 'getStatus', {'appliance_desc_key': key})['laundry_room'])
-        print(self.get('appliance', 'getStatus', {'appliance_desc_key': key})['laundry_room'])
+        return Status(self.get('appliance', 'getStatus', {'appliance_desc_key': key})['appliance'])
 
     def get_appliances(self, location):
         return [Appliance(raw) for raw in

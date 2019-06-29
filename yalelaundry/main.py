@@ -19,6 +19,7 @@ class _base(dict):
         self.update(raw)
         self.update(self.__dict__)
         self.__dict__ = self
+        self.api = api
 
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, dict.__repr__(self))
@@ -34,6 +35,12 @@ class Room(_base):
         self.status = raw['status']
         self.online = (self.status == 'online')
         self.offline = not self.online
+
+    def availability(self):
+        return self.api.get_availability(self.id)
+
+    def totals(self):
+        return self.api.get_totals(self.id)
 
 
 class Availability(_base):
@@ -62,7 +69,7 @@ class Status(_base):
         self.time_remaining = self._read_time(self.time_remaining_raw)
         self.change_time = int(raw['status_change_time'])
         self.out_of_service = bool(int(raw['out_of_service']))
-        self.status = raw['status']
+        self.status_raw = raw['status']
         self.available = (self.status == 'Available')
         self.in_use = (self.status == 'In Use')
 
@@ -84,10 +91,13 @@ class Appliance(_base):
         self.type = raw['appliance_type']
         self.washer = (self.type == 'WASHER')
         self.dryer = (self.type == 'DRYER')
-        self.status = raw['status']
+        self.status_raw = raw['status']
         self.available = (self.status == 'Available')
         self.in_use = (self.status == 'In Use')
         # TODO: there are probably more statuses
+
+    def status(self):
+        return self.api.get_status(self.key)
 
 
 class YaleLaundry:
@@ -121,7 +131,7 @@ class YaleLaundry:
     def get_availability(self, location):
         return Availability(self.get('room', 'getNumAvailable', {'location': location})['laundry_room'], self)
 
-    def get_total(self, location):
+    def get_totals(self, location):
         return Total(self.get('room', 'getTotal', {'location': location})['laundry_room'], self)
 
     def get_status(self, key):

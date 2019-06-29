@@ -4,9 +4,15 @@ import os
 # "api" name can be whatever is most convenient for your program
 api = yalelaundry.YaleLaundry(os.environ['YALE_API_KEY'])
 
-rooms = api.get_rooms()
-availability = api.get_availability(rooms[1].id)
-total = api.get_total(rooms[1].id)
-appliances = api.get_appliances(rooms[1].id)
-status = api.get_status(appliances[0].key)
-print(status)
+# You can get anything directly by ID/key
+rooms = api.rooms()
+availability = api.availability(rooms[1].id)
+total = api.total(rooms[1].id)
+appliances = api.appliances(rooms[1].id)
+status = api.status(appliances[0].key)
+
+# Or you can use a more intuitive syntax
+room = rooms[0]
+availability = room.availability
+totals = room.totals
+print("There are %d/%d dryers available at %s." % (availability.dryers, totals.dryers, room.name))

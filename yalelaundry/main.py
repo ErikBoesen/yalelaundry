@@ -38,11 +38,11 @@ class Room(_base):
 
     @property
     def availability(self):
-        return self.api.get_availability(self.id)
+        return self.api.availability(self.id)
 
     @property
     def totals(self):
-        return self.api.get_totals(self.id)
+        return self.api.totals(self.id)
 
 
 class Availability(_base):
@@ -100,7 +100,7 @@ class Appliance(_base):
 
     @property
     def status(self):
-        return self.api.get_status(self.key)
+        return self.api.status(self.key)
 
 
 class YaleLaundry:
@@ -127,19 +127,19 @@ class YaleLaundry:
             # TODO: Can we be more helpful?
             raise Exception('API request failed. Data returned: ' + request.text)
 
-    def get_rooms(self):
+    def rooms(self):
         return [Room(raw, self) for raw in
                 self.get('school', 'getRoomData')['school']['laundry_rooms']['laundryroom']]
 
-    def get_availability(self, location):
+    def availability(self, location):
         return Availability(self.get('room', 'getNumAvailable', {'location': location})['laundry_room'], self)
 
-    def get_totals(self, location):
+    def totals(self, location):
         return Totals(self.get('room', 'getTotal', {'location': location})['laundry_room'], self)
 
-    def get_status(self, key):
+    def status(self, key):
         return Status(self.get('appliance', 'getStatus', {'appliance_desc_key': key})['appliance'], self)
 
-    def get_appliances(self, location):
+    def appliances(self, location):
         return [Appliance(raw, self) for raw in
                 self.get('room', 'getAppliances', {'location': location})['laundry_room']['appliances']['appliance']]

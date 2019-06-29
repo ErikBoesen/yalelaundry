@@ -36,9 +36,11 @@ class Room(_base):
         self.online = (self.status == 'online')
         self.offline = not self.online
 
+    @property
     def availability(self):
         return self.api.get_availability(self.id)
 
+    @property
     def totals(self):
         return self.api.get_totals(self.id)
 
@@ -57,7 +59,7 @@ class Availability(_base):
         self.washer = self._int(raw['washer'])
 
 
-class Total(Availability):
+class Totals(Availability):
     pass
 
 
@@ -96,6 +98,7 @@ class Appliance(_base):
         self.in_use = (self.status == 'In Use')
         # TODO: there are probably more statuses
 
+    @property
     def status(self):
         return self.api.get_status(self.key)
 
@@ -132,7 +135,7 @@ class YaleLaundry:
         return Availability(self.get('room', 'getNumAvailable', {'location': location})['laundry_room'], self)
 
     def get_totals(self, location):
-        return Total(self.get('room', 'getTotal', {'location': location})['laundry_room'], self)
+        return Totals(self.get('room', 'getTotal', {'location': location})['laundry_room'], self)
 
     def get_status(self, key):
         return Status(self.get('appliance', 'getStatus', {'appliance_desc_key': key})['appliance'], self)

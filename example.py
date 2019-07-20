@@ -10,6 +10,7 @@ availability = api.availability(rooms[1].id)
 total = api.totals(rooms[1].id)
 appliances = api.appliances(rooms[1].id)
 status = api.status(appliances[0].key)
+print(appliances)
 
 # Or you can use a more intuitive syntax
 room = rooms[8]

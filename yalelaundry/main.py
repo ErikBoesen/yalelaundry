@@ -44,6 +44,10 @@ class Room(_base):
     def totals(self):
         return self.api.totals(self.id)
 
+    @property
+    def appliances(self):
+        return self.api.appliances(self.id)
+
 
 class Availability(_base):
     def _int(self, raw):

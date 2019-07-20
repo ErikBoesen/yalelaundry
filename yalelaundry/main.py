@@ -44,6 +44,10 @@ class Room(_base):
         return self.api.totals(self.id)
 
     @property
+    def use(self):
+        return self.api.use(self.id)
+
+    @property
     def appliances(self):
         return self.api.appliances(self.id)
 
@@ -109,6 +113,12 @@ class Appliance(_base):
         return self.api.status(self.key)
 
 
+class Use:
+    def __init__(self, availability, totals):
+        self.availability = availability
+        self.totals = totals
+
+
 class YaleLaundry:
     API_ROOT = 'https://gw.its.yale.edu/soa-gateway/laundry/'
 
@@ -149,6 +159,13 @@ class YaleLaundry:
 
     def totals(self, location):
         return Totals(self.get('room', 'getTotal', {'location': location})['laundry_room'], self)
+
+    def use(self, location):
+        """
+        Helper method to get both availability and totals for a given location.
+        """
+        return Use(self.availability(location),
+                   self.totals(location))
 
     def status(self, key):
         return Status(self.get('appliance', 'getStatus', {'appliance_desc_key': key})['appliance'], self)

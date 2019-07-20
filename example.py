@@ -6,7 +6,7 @@ api = yalelaundry.YaleLaundry(os.environ['YALE_API_KEY'])
 
 # You can get anything directly by ID/key
 rooms = api.rooms()
-room = rooms[10]
+room = rooms[11]
 print(room.name)
 print(room)
 availability = api.availability(room.id)
@@ -20,4 +20,6 @@ for appliance in appliances:
 room = api.room('Trumbull College')
 availability = room.availability
 totals = room.totals
-print('There are %d/%d dryers available at %s.' % (availability.dryer, totals.dryer, room.name))
+# You can also use the special use method to get around requesting both availability and totals
+use = room.use
+print('There are %d/%d dryers available at %s.' % (use.availability.dryer, use.totals.dryer, room.name))

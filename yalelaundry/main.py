@@ -36,12 +36,15 @@ class Room(_base):
         self.online = (self.status == 'online')
         self.offline = not self.online
 
+    @property
     def availability(self):
         return self.api.availability(self.id)
 
+    @property
     def totals(self):
         return self.api.totals(self.id)
 
+    @property
     def appliances(self):
         return self.api.appliances(self.id)
 

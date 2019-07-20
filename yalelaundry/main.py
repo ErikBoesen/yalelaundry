@@ -78,6 +78,7 @@ class Status(_base):
         self.status_raw = raw['status']
         self.available = (self.status == 'Available')
         self.in_use = (self.status == 'In Use')
+        self.idle = (self.status == 'Idle')
 
 
 class Appliance(_base):

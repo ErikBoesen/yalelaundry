@@ -13,7 +13,7 @@ status = api.status(appliances[0].key)
 print(appliances)
 
 # Or you can use a more intuitive syntax
-room = rooms[8]
+room = api.room('Trumbull College')
 availability = room.availability
 totals = room.totals
 print("There are %d/%d dryers available at %s." % (availability.dryer, totals.dryer, room.name))

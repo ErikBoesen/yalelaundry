@@ -139,7 +139,10 @@ class YaleLaundry:
 
     def room(self, identifier):
         rooms = self.rooms()
-        return next(room for room in rooms if room.id == identifier or room.name == identifier.upper())
+        try:
+            return next(room for room in rooms if room.id == identifier or room.name == identifier.upper())
+        except StopIteration:
+            return None
 
     def availability(self, location):
         return Availability(self.get('room', 'getNumAvailable', {'location': location})['laundry_room'], self)

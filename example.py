@@ -9,8 +9,8 @@ rooms = api.rooms()
 room = rooms[11]
 print(room.name)
 print(room)
-availability = api.availability(room.id)
-total = api.totals(room.id)
+available = api.available(room.id)
+total = api.total(room.id)
 appliances = api.appliances(room.id)
 status = api.status(appliances[0].key)
 for appliance in appliances:
@@ -18,8 +18,8 @@ for appliance in appliances:
 
 # Or you can use a more intuitive syntax
 room = api.room('Trumbull College')
-open = room.open
+available = room.available
 total = room.total
 # You can also use the special use method to get around requesting both availability and totals
 use = room.use
-print('There are %d/%d dryers available at %s.' % (use.open.dryer, use.total.dryer, room.name))
+print('There are %d/%d dryers available at %s.' % (use.available.dryers, use.total.dryers, room.name))

@@ -13,7 +13,7 @@ class _base(dict):
             return 0
         digits_only = [c for c in raw if c.isdigit()]
         if digits_only:
-            return int(digits_only)
+            return int(''.join(digits_only))
 
     def __init__(self, raw, api):
         self.update(raw)

@@ -18,8 +18,8 @@ for appliance in appliances:
 
 # Or you can use a more intuitive syntax
 room = api.room('Trumbull College')
-availability = room.availability
-totals = room.totals
+open = room.open
+total = room.total
 # You can also use the special use method to get around requesting both availability and totals
 use = room.use
-print('There are %d/%d dryers available at %s.' % (use.availability.dryer, use.totals.dryer, room.name))
+print('There are %d/%d dryers available at %s.' % (use.open.dryer, use.total.dryer, room.name))

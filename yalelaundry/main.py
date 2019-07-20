@@ -5,7 +5,7 @@ import re
 class _base(dict):
     def _read_time(self, raw: str) -> int:
         """
-        Given a string describing how much time remains until availability, return how many minutes are actually left.
+        Given a string describing how much time remains until available, return how many minutes are actually left.
         :param raw: string describing time remaining.
         :return: number of minutes remaining, or 0 if the machine is not in operation.
         """
@@ -36,12 +36,12 @@ class Room(_base):
         self.offline = not self.online
 
     @property
-    def availability(self):
-        return self.api.availability(self.id)
+    def available(self):
+        return self.api.available(self.id)
 
     @property
-    def totals(self):
-        return self.api.totals(self.id)
+    def total(self):
+        return self.api.total(self.id)
 
     @property
     def use(self):
@@ -52,7 +52,7 @@ class Room(_base):
         return self.api.appliances(self.id)
 
 
-class Availability(_base):
+class Available(_base):
     def _int(self, raw):
         if raw == 'undefined':
             return None
@@ -62,11 +62,11 @@ class Availability(_base):
     def __init__(self, raw, api):
         super().__init__(raw, api)
 
-        self.dryer = self._int(raw['dryer'])
-        self.washer = self._int(raw['washer'])
+        self.dryers = self._int(raw['dryer'])
+        self.washers = self._int(raw['washer'])
 
 
-class Totals(Availability):
+class Total(Available):
     pass
 
 
@@ -114,9 +114,9 @@ class Appliance(_base):
 
 
 class Use:
-    def __init__(self, availability, totals):
-        self.availability = availability
-        self.totals = totals
+    def __init__(self, available, total):
+        self.available = available
+        self.total = total
 
 
 class YaleLaundry:
@@ -154,18 +154,18 @@ class YaleLaundry:
         except StopIteration:
             return None
 
-    def availability(self, location):
-        return Availability(self.get('room', 'getNumAvailable', {'location': location})['laundry_room'], self)
+    def available(self, location):
+        return Available(self.get('room', 'getNumAvailable', {'location': location})['laundry_room'], self)
 
-    def totals(self, location):
-        return Totals(self.get('room', 'getTotal', {'location': location})['laundry_room'], self)
+    def total(self, location):
+        return Total(self.get('room', 'getTotal', {'location': location})['laundry_room'], self)
 
     def use(self, location):
         """
-        Helper method to get both availability and totals for a given location.
+        Helper method to get both available and total for a given location.
         """
-        return Use(self.availability(location),
-                   self.totals(location))
+        return Use(self.available(location),
+                   self.total(location))
 
     def status(self, key):
         return Status(self.get('appliance', 'getStatus', {'appliance_desc_key': key})['appliance'], self)

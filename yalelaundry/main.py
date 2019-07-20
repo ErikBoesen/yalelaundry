@@ -94,6 +94,7 @@ class Appliance(_base):
         self.online = (self.lrm_status == 'Online')
         self.offline = not self.online
         self.label = raw['label']
+        self.number = int(self.label)
         self.type = raw['appliance_type']
         self.washer = (self.type == 'WASHER')
         self.dryer = (self.type == 'DRYER')

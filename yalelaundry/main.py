@@ -131,6 +131,10 @@ class YaleLaundry:
         return [Room(raw, self) for raw in
                 self.get('school', 'getRoomData')['school']['laundry_rooms']['laundryroom']]
 
+    def room(self, identifier):
+        rooms = self.rooms()
+        return next(room for room in rooms if room.id == identifier or room.name == identifier.upper())
+
     def availability(self, location):
         return Availability(self.get('room', 'getNumAvailable', {'location': location})['laundry_room'], self)
 

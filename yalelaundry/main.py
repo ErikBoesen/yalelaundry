@@ -7,13 +7,12 @@ class _base(dict):
         """
         Given a string describing how much time remains until availability, return how many minutes are actually left.
         :param raw: string describing time remaining.
-        :return: number of minutes remaining.
+        :return: number of minutes remaining, or 0 if the machine is not in operation.
         """
-        if raw == 'available':
-            return 0
         digits_only = [c for c in raw if c.isdigit()]
         if digits_only:
             return int(''.join(digits_only))
+        return 0
 
     def __init__(self, raw, api):
         self.update(raw)
